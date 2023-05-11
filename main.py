@@ -42,7 +42,7 @@ def Get_score(board, player):
             if line1 == [player, player, player, player]:
                 score += 100
 
-    # check if the player win horizontal by connect 4 in one row
+    # check if the player win horizontal by connecting 4 in one row
     for i in range(6):  # we have 6 rows
         for j in range(4):
             # list that store 4 element that get out from condation
