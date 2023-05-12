@@ -172,9 +172,52 @@ def make_move(board,depth,player,type):
     board[best_move[0]][best_move[1]] = player
     
     
-    
+def Game (board,depth,type):
+    if type == "simple":
+        print("Using Simple Algorithm ")  
+    else:
+        print("Using Alpha-Beta Algorithm ")  
+    score1 = 0
+    score2 = 0
+    while True:
+        moves = Move_Options(board)
+        if(len(moves)==0):
+            score1 = 0
+            score2 = 0
+            break
+        #first AI Agent play using a minmax algorithm 
+        make_move(board , depth,AI_Agent,type)
+        print_board(board)
+        score1 = Get_score(board,AI_Agent)
+        #after every move agent do it in board we check if it win or not 
+        if score1 == 100:
+            break
+        #second player is computer, it play randomly not using any algorithm 
+        #check if the board is full and no one is win so we get out of loop and the result is draw
+        
+        index = random.randint(0,len(moves)-1)
+        # make_move(board,depth,Computer,type)
+        print("Computer select randomly: ",moves[index])
+        board[moves[index][0]][moves[index][1]] = Computer
+        print_board(board)
+        score2 = Get_score(board,Computer)
+        #after every move computer do it in board we check if it win or not 
+        if score2 == 100 :
+            break
+    #check which one is win in game or game ended draw    
+    if(score1 > 0 and score2 == 0):
+        print("score1= ",score1)
+        print("AI Agent win")
+    elif(score2 > 0 and score1 == 0):
+        print("score2= ",score2)
+        print("Computer win")
+    elif(score1 == 0 and score2 == 0):
+        print(score1 , "     ",score2)
+        print("DRAW")
+
+
     #GUI to select the algorithm type and difficulty level of the game
-    root = tk.Tk() #create root window
+root = tk.Tk() #create root window
 root.title("connect four game")  #name of root window
 root.geometry("300x150")   #size of root window
 
