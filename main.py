@@ -148,3 +148,22 @@ def Simple_MinMax_Algorithm(board ,depth , maxstate):
              min_val = min(min_val,value)
         return min_val
     
+def make_move(board,depth,player,type):
+    moves = Move_Options(board)
+    if(len(moves)== 0):
+        return
+    best_move = None
+    best_score = MAX
+    for current_move in moves:
+        new_board = copy.deepcopy(board)
+        new_board[current_move[0]][current_move[1]] = player
+        if type == "simple":
+            value = Simple_MinMax_Algorithm(new_board,depth,True)
+        else:
+            value = MinMax_Algorithm(new_board,depth,True,MAX,MIN)
+
+        if value > best_score :
+            best_score = value
+            best_move = current_move
+    print("AI Agent Select Best Move = ",best_move)        
+    board[best_move[0]][best_move[1]] = player
