@@ -1,5 +1,8 @@
+import tkinter as tk
 import random
 import copy
+from tkinter import *
+from tkinter import ttk
 
 # define min and max for alpha and beta
 MAX = float('-inf')  # for alpha = -infinity
@@ -167,3 +170,60 @@ def make_move(board,depth,player,type):
             best_move = current_move
     print("AI Agent Select Best Move = ",best_move)        
     board[best_move[0]][best_move[1]] = player
+    
+    
+    
+    #GUI
+    root = tk.Tk() #create root window
+root.title("connect four game")  #name of root window
+root.geometry("300x150")   #size of root window
+
+        # Create algorithm type label and it's option
+label = tk.Label(root, text="Algorithm Type:")
+label.pack()
+algorithm_type_var = tk.StringVar()  #variable to store selected optin
+options_menu = tk.OptionMenu(root, algorithm_type_var, "Minimax algorithm", "Alpha-Beta Pruning algorithm")
+options_menu.pack()
+
+        # Create difficulty level label and it's option
+label = tk.Label(root, text="Difficulty Level:")
+label.pack()
+difficulty_level_var = tk.StringVar() #variable to store selected optin
+options_menu = tk.OptionMenu(root, difficulty_level_var, "Easy", "Medium", "Hard")
+options_menu.pack()
+
+#function to get selected algorithm type and difficulty level and print them with start the connect four game
+def start_game():
+    algorithm_type = algorithm_type_var.get()
+    difficulty_level = difficulty_level_var.get()
+
+    if algorithm_type == "Minimax algorithm":
+        type = "simple"
+    else:
+        type = "alpha-beta"
+
+    # Start the game with the selected algorithm type and difficulty level
+    print("Starting game with algorithm type:", algorithm_type, "and difficulty level:", difficulty_level)
+    Game(board, 3, type)
+
+
+        # Create submit button when clicked then call start game function to start the game
+start_button = tk.Button(root, text="Start Game", command=start_game)
+start_button.pack()
+
+         # Create menu bar
+menu_bar = tk.Menu(root)
+root.config(menu=menu_bar)  #add the menu bar to the root window
+
+            # Create exit menu
+exit_menu = tk.Menu(menu_bar, tearoff=0)  #tearoff arg to prevent move
+menu_bar.add_cascade(label="Exit", menu=exit_menu)  #add exit menu to menu bar
+
+        # Create help menu
+help_menu = tk.Menu(menu_bar, tearoff=0)  #tearoff arg to prevent move 
+help_menu.add_command(label="About")  #add about menu to help menu
+menu_bar.add_cascade(label="Help", menu=help_menu)  #add help menu to menu bar
+
+#wait to user input and update 
+root.mainloop()
+       
