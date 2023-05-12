@@ -116,3 +116,35 @@ def MinMax_Algorithm(board , depth , maxstate,alpha,beta):
              if alpha >= beta:
                 break
         return beta
+    
+    
+#define the simple version of min max algorithm
+def Simple_MinMax_Algorithm(board ,depth , maxstate):
+    moves = Move_Options(board)
+    if (depth ==0):
+        return Get_score(board,AI_Agent)  
+    if (len(moves) == 0):
+        return Get_score(board,AI_Agent)
+    #if maxstate is true that means we are in max mode
+    if (maxstate):
+        max_val = MAX
+        for current_move in moves:
+            new_board = copy.deepcopy(board)
+            #moves is represent as pair of 2 numbers(i,j), i for rows and j for columns
+            # move[0] represent first number in pair (row number)
+            # move[1] represent second number in pair (culumn number)
+            new_board[current_move[0]][current_move[1]] = AI_Agent 
+            #call the algorithm recursivally with depth-1 and in other mode(that mean if we in max level we call min level and so on..)
+            value = Simple_MinMax_Algorithm(new_board,depth-1,False)
+            max_val = max(max_val,value)
+        return max_val     
+    #if maxstate is false we are in min mode
+    else:
+        min_val = MIN
+        for current_move in moves:
+             new_board =copy.deepcopy(board)
+             new_board[current_move[0]][current_move[1]] = Computer
+             value = Simple_MinMax_Algorithm(new_board,depth-1,True)
+             min_val = min(min_val,value)
+        return min_val
+    
