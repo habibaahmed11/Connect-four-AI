@@ -173,7 +173,7 @@ def make_move(board,depth,player,type):
     
     
     
-    #GUI
+    #GUI to select the algorithm type and difficulty level of the game
     root = tk.Tk() #create root window
 root.title("connect four game")  #name of root window
 root.geometry("300x150")   #size of root window
