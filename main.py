@@ -1,18 +1,65 @@
-import tkinter as tk
 import random
 import copy
-from tkinter import *
-from tkinter import ttk
-
-# define min and max for alpha and beta
-MAX = float('-inf')  # for alpha = -infinity
-MIN = float('inf')  # for beta  = infinity
-# define the two players
+list1=[]
+list2 =[]
+#define min and max for alpha and beta
+MAX = float('-inf') #for alpha = -infinity
+MIN = float('inf') #for beta  = infinity 
+#define the two players
 AI_Agent = "R"
-Computer = "Y"
+Computer= "Y"
+EMPTY = 0
+def evaluate_window(window, piece):
+	score = 0
+	if window.count(AI_Agent) == 4:
+		score += 100
+	elif window.count(AI_Agent) == 3 and window.count(EMPTY) == 1:
+		score += 5
+	elif window.count(AI_Agent) == 2 and window.count(EMPTY) == 2:
+		score += 2
 
+	if window.count(Computer) == 3 and window.count(EMPTY) == 1:
+		score -= 4
 
-# print board like connect 4 game
+	return score
+
+def score_position(board, piece):
+	score = 0
+	ROW_COUNT = 6
+	COLUMN_COUNT = 7
+	WINDOW_LENGTH = 4
+    
+	# Score center column
+	center_count = sum(row[COLUMN_COUNT // 2] == piece for row in board)
+	score += center_count * 3
+    
+
+	# Score horizontal
+	for row in board:
+		for col in range(COLUMN_COUNT - WINDOW_LENGTH + 1):
+			window = row[col:col + WINDOW_LENGTH]
+			score += evaluate_window(window, piece)
+
+	# Score vertical
+	for col in range(COLUMN_COUNT):
+		for row in range(ROW_COUNT - WINDOW_LENGTH + 1):
+			window = [board[row + i][col] for i in range(WINDOW_LENGTH)]
+			score += evaluate_window(window, piece)
+
+	# Score positive sloped diagonal
+	for row in range(ROW_COUNT - WINDOW_LENGTH + 1):
+		for col in range(COLUMN_COUNT - WINDOW_LENGTH + 1):
+			window = [board[row + i][col + i] for i in range(WINDOW_LENGTH)]
+			score += evaluate_window(window, piece)
+
+	# Score negative sloped diagonal
+	for row in range(ROW_COUNT - WINDOW_LENGTH + 1):
+		for col in range(WINDOW_LENGTH - 1, COLUMN_COUNT):
+			window = [board[row + i][col - i] for i in range(WINDOW_LENGTH)]
+			score += evaluate_window(window, piece)
+
+	return score
+#print board like connect 4 game
 def print_board(board):
     for row in range(6):
         print("| ", end="")
@@ -20,60 +67,69 @@ def print_board(board):
             print(board[row][col], "| ", end="")
         print()
     print("-----------------------------")
-
-
-# define board of 2 dimensions with 6 rows and 7 colums to create connect 4 game
+#define board of 2 dimensions with 6 rows and 7 colums to create connect 4 game   
 board = [
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-]
-
-
-# define function that calc score of one of players
-def Get_score(board, player):
-
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+        ]
+#define function that calc score of one of players 
+def Get_score(board,player):
     score = 0
-    # check if player wins in the digonal
+    #check if player wins in the digonal
     for i in range(3):
         for j in range(4):
-            # its list of 4 element which i loop in board to get if there 4 element in one digonal
-            # we loop with k time becouse if there 4 connected that mean you win
-            line1 = [board[i + k][j + k] for k in range(4)]
-            if line1 == [player, player, player, player]:
-                score += 100
+            #its list of 4 element which i loop in board to get if there 4 element in one digonal
+            # we loop with k time becouse if there 4 connected that mean you win  
+            line1 = [board[i+k][j+k] for k in range(4)] 
+            if line1 == [player,player,player,player]:
+                score +=100
                 return score
-    #check if player win in other diagonal
     for i in range(3, 6):
         for j in range(4):
             line1 = [board[i-k][j+k] for k in range(4)] 
             if line1 == [player,player,player,player]:
                 score +=100
-                return score  
-    # check if the player win horizontal by connecting 4 in one row
-    for i in range(6):  # we have 6 rows
+                return score      
+
+
+    #check if the player win horizontal by connect 4 in one row 
+    for i in range(6): #we have 6 rows
         for j in range(4):
-            # list that store 4 element that get out from condation
-            line2 = [board[i][j + k] for k in range(4)]
-            if line2 == [player, player, player, player]:
-                score += 100
+            #list that store 4 element that get out from condation
+            line2 = [board[i][j+k] for k in range(4)]
+            if line2 == [player,player,player,player]:  
+                score+=100  
                 return score
 
-    # check if the player win vertical by connect 4 in one column
-    for j in range(7):  # we have 6 rows
+
+    #check if the player win vertical by connect 4 in one column 
+    for j in range(7): #we have 6 rows
         for i in range(3):
-            # list that store 4 element that get out from condation
-            line3 = [board[i + k][j] for k in range(4)]
-            if line3 == [player, player, player, player]:
-                score += 100
+            #list that store 4 element that get out from condation
+            line3 = [board[i+k][j] for k in range(4)]
+            if line3 == [player,player,player,player]:  
+                score+=100  
                 return score
 
-    return score
-
-
+    return score  
+def winning_move(board,player):
+     value = Get_score(board,player)
+     if(value == 100):
+          return True
+     else:
+          return False
+def is_terminal_game(board):
+     moves = Move_Options(board)
+     if len(moves) == 0 or winning_move(board,AI_Agent) or winning_move(board,Computer):
+          return True
+     else:
+          return False
+def drop_piece(board ,row,col,player):
+     board[row][col] = player     
 #function get all possible moves that you can do
 def Move_Options(board):
     avalibale_move =[]
@@ -83,95 +139,119 @@ def Move_Options(board):
                 if board[i][j] == 0:
                     avalibale_move.append((i,j))
                     break
-    return avalibale_move   
-
+    return avalibale_move    
 #implement minmax algorithm with alpha&beta purning 
 def MinMax_Algorithm(board , depth , maxstate,alpha,beta):
     moves = Move_Options(board)
-    if (depth ==0):
-        return Get_score(board,AI_Agent)  
-    if (len(moves) == 0):
-        return Get_score(board,AI_Agent)
-    if(Get_score(board,AI_Agent) == 100 ):
-        return Get_score(board,AI_Agent)
+    is_terminal = is_terminal_game(board)
+    if (depth ==0 or is_terminal):
+        if(is_terminal):
+            if (winning_move(board,AI_Agent)):
+               return (None,100000)
+            elif(winning_move(board,Computer)):
+                 return (None,-100000)
+            else:
+                 return (None,0)
+        else: 
+            return (None,score_position(board,AI_Agent))   
 
     #if maxstate is true that means we are in max mode
     if (maxstate):
+        max_val = MAX
+        cur = random.choice(moves)
         for current_move in moves:
             new_board = copy.deepcopy(board)
             #moves is represent as pair of 2 numbers(i,j), i for rows and j for columns
             # move[0] represent first number in pair (row number)
             # move[1] represent second number in pair (culumn number)
-            new_board[current_move[0]][current_move[1]] = AI_Agent 
+            drop_piece(new_board,current_move[0],current_move[1] ,AI_Agent)
             #call the algorithm recursivally with depth-1 and in other mode(that mean if we in max level we call min level and so on..)
-            value = MinMax_Algorithm(new_board,depth-1,False,alpha,beta)
+            value = MinMax_Algorithm(new_board,depth-1,False,alpha,beta)[1]
+            # max_val = max(max_val,value)
+            if value > max_val:
+                max_val = value
+                cur = current_move
             alpha = max(value,alpha)
             if alpha >= beta:
                 break
-        return alpha 
+        return cur,max_val
     #if maxstate is false we are in min mode
     else:
+        min_val = MIN
+        cur2 = random.choice(moves)
         for current_move in moves:
              new_board =copy.deepcopy(board)
-             new_board[current_move[0]][current_move[1]] = Computer
-             value = MinMax_Algorithm(new_board,depth-1,True,alpha,beta)
+             drop_piece(new_board,current_move[0],current_move[1] ,Computer)
+             value = MinMax_Algorithm(new_board,depth-1,True,alpha,beta)[1]
+            #  min_val = min(min_val,value)
+             if value < min_val:
+                 min_val = value
+                 cur2 = current_move
              beta = min(beta,value)
              if alpha >= beta:
                 break
-        return beta
-    
+        return cur2,min_val
     
 #define the simple version of min max algorithm
 def Simple_MinMax_Algorithm(board ,depth , maxstate):
     moves = Move_Options(board)
-    if (depth ==0):
-        return Get_score(board,AI_Agent)  
-    if (len(moves) == 0):
-        return Get_score(board,AI_Agent)
+    is_terminal = is_terminal_game(board)
+    if (depth ==0 or is_terminal):
+        if(is_terminal):
+            if (winning_move(board,AI_Agent)):
+               return (None,100000)
+            elif(winning_move(board,Computer)):
+                 return (None,-100000)
+            else:
+                 return (None,0)
+        else: 
+            return (None,score_position(board,AI_Agent))
     #if maxstate is true that means we are in max mode
     if (maxstate):
         max_val = MAX
+        cur =random.choice(moves)
         for current_move in moves:
             new_board = copy.deepcopy(board)
             #moves is represent as pair of 2 numbers(i,j), i for rows and j for columns
             # move[0] represent first number in pair (row number)
             # move[1] represent second number in pair (culumn number)
-            new_board[current_move[0]][current_move[1]] = AI_Agent 
+            drop_piece(new_board,current_move[0],current_move[1] ,AI_Agent)
             #call the algorithm recursivally with depth-1 and in other mode(that mean if we in max level we call min level and so on..)
-            value = Simple_MinMax_Algorithm(new_board,depth-1,False)
-            max_val = max(max_val,value)
-        return max_val     
+            value = Simple_MinMax_Algorithm(new_board,depth-1,False)[1]
+            if value > max_val:
+                 min_val = value
+                 cur = current_move
+        return cur,max_val     
     #if maxstate is false we are in min mode
     else:
         min_val = MIN
+        cur2 =random.choice(moves)
         for current_move in moves:
              new_board =copy.deepcopy(board)
-             new_board[current_move[0]][current_move[1]] = Computer
-             value = Simple_MinMax_Algorithm(new_board,depth-1,True)
-             min_val = min(min_val,value)
-        return min_val
+             drop_piece(new_board,current_move[0],current_move[1] ,Computer)
+             value = Simple_MinMax_Algorithm(new_board,depth-1,True)[1]
+             if value < min_val:
+                 min_val = value
+                 cur2 = current_move
+        return cur2,min_val
     
+
+#define function that select best move to take
 def make_move(board,depth,player,type):
     moves = Move_Options(board)
     if(len(moves)== 0):
         return
     best_move = None
     best_score = MAX
-    for current_move in moves:
-        new_board = copy.deepcopy(board)
-        new_board[current_move[0]][current_move[1]] = player
-        if type == "simple":
-            value = Simple_MinMax_Algorithm(new_board,depth,True)
-        else:
-            value = MinMax_Algorithm(new_board,depth,True,MAX,MIN)
-
-        if value > best_score :
-            best_score = value
-            best_move = current_move
+    if type == "simple":
+        best_move,best_score = Simple_MinMax_Algorithm(board,depth,True)
+    else:
+        best_move,best_score = MinMax_Algorithm(board,depth,True,MAX,MIN)
     print("AI Agent Select Best Move = ",best_move)        
-    board[best_move[0]][best_move[1]] = player
-    
-    
+    drop_piece(board,best_move[0],best_move[1],player)
+    list1.append(best_move)
+
+#function of the game 
 def Game (board,depth,type):
     if type == "simple":
         print("Using Simple Algorithm ")  
@@ -188,88 +268,36 @@ def Game (board,depth,type):
         #first AI Agent play using a minmax algorithm 
         make_move(board , depth,AI_Agent,type)
         print_board(board)
-        score1 = Get_score(board,AI_Agent)
+        score1 = winning_move(board,AI_Agent)
         #after every move agent do it in board we check if it win or not 
-        if score1 == 100:
+        if score1:
             break
         #second player is computer, it play randomly not using any algorithm 
         #check if the board is full and no one is win so we get out of loop and the result is draw
         
         index = random.randint(0,len(moves)-1)
+        list2.append(moves[index])
         # make_move(board,depth,Computer,type)
         print("Computer select randomly: ",moves[index])
-        board[moves[index][0]][moves[index][1]] = Computer
+        drop_piece(board,moves[index][0],moves[index][1],Computer)
         print_board(board)
-        score2 = Get_score(board,Computer)
+        score2 = winning_move(board,Computer)
         #after every move computer do it in board we check if it win or not 
-        if score2 == 100 :
+        if score2:
             break
     #check which one is win in game or game ended draw    
-    if(score1 > 0 and score2 == 0):
-        print("score1= ",score1)
+    if(winning_move(board,AI_Agent)):
+        print("score1= ",Get_score(board,AI_Agent))
         print("AI Agent win")
-    elif(score2 > 0 and score1 == 0):
-        print("score2= ",score2)
+    elif(winning_move(board,AI_Agent)):
+        print("score2= ",Get_score(board,Computer))
         print("Computer win")
-    elif(score1 == 0 and score2 == 0):
-        print(score1 , "     ",score2)
+    else:
         print("DRAW")
 
 
-    #GUI to select the algorithm type and difficulty level of the game
-root = tk.Tk() #create root window
-root.title("connect four game")  #name of root window
-root.geometry("300x150")   #size of root window
 
-        # Create algorithm type label and it's option
-label = tk.Label(root, text="Algorithm Type:")
-label.pack()
-algorithm_type_var = tk.StringVar()  #variable to store selected optin
-options_menu = tk.OptionMenu(root, algorithm_type_var, "Minimax algorithm", "Alpha-Beta Pruning algorithm")
-options_menu.pack()
+type = input("Enter Which Algorithm You Want To Use? ")
+Game(board,4,type)
+print_board(board)
 
-        # Create difficulty level label and it's option
-label = tk.Label(root, text="Difficulty Level:")
-label.pack()
-difficulty_level_var = tk.StringVar() #variable to store selected optin
-options_menu = tk.OptionMenu(root, difficulty_level_var, "Easy", "Medium", "Hard")
-options_menu.pack()
-
-#function to get selected algorithm type and difficulty level and print them with start the connect four game
-def start_game():
-    algorithm_type = algorithm_type_var.get()
-    difficulty_level = difficulty_level_var.get()
-
-    if algorithm_type == "Minimax algorithm":
-        type = "simple"
-    else:
-        type = "alpha-beta"
-
-    # Start the game with the selected algorithm type and difficulty level
-    print("Starting game with algorithm type:", algorithm_type, "and difficulty level:", difficulty_level)
-    Game(board, 3, type)
-
-
-        # Create submit button when clicked then call start game function to start the game
-start_button = tk.Button(root, text="Start Game", command=start_game)
-start_button.pack()
-
-         # Create menu bar
-menu_bar = tk.Menu(root)
-root.config(menu=menu_bar)  #add the menu bar to the root window
-
-            # Create exit menu
-exit_menu = tk.Menu(menu_bar, tearoff=0)  #tearoff arg to prevent move
-menu_bar.add_cascade(label="Exit", menu=exit_menu)  #add exit menu to menu bar
-
-        # Create help menu
-help_menu = tk.Menu(menu_bar, tearoff=0)  #tearoff arg to prevent move 
-help_menu.add_command(label="About")  #add about menu to help menu
-menu_bar.add_cascade(label="Help", menu=help_menu)  #add help menu to menu bar
-
-#wait to user input and update 
-root.mainloop()
-       
-
-
-#last
