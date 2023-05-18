@@ -16,15 +16,11 @@ def main():
         (game_board, game_end) = board.get_game_grid()
 
         # FOR DEBUG PURPOSES
-        #board.print_grid(game_board)
+        board.print_grid(game_board)
 
         # YOUR CODE GOES HERE
         column = make_move(game_board, 4, 1, "alpha")
 
-        print("made move")
-        while(column==6):
-            moves=Move_Options(game_board)
-            column=random.choice(moves)[1]
 
         #board.select_column(column)
         # Insert here the action you want to perform based on the output of the algorithm
