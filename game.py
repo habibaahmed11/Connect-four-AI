@@ -4,6 +4,7 @@ import random
 from gamealgorithms import make_move, is_terminal_game, winning_move, Move_Options
 
 
+
 # GAME LINK
 # http://kevinshannon.com/connect4/
 
@@ -19,13 +20,8 @@ def main():
         board.print_grid(game_board)
 
         # YOUR CODE GOES HERE
-        column = make_move(game_board, 4, 1, "alpha")
+        column = make_move(game_board, 5, 1, "alpha")
 
-
-        #board.select_column(column)
-        # Insert here the action you want to perform based on the output of the algorithm
-        # You can use the following function to select a column
-        #column = random.randint(0, 6)
         #print(column)
         board.select_column(column)
 

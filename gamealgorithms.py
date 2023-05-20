@@ -7,8 +7,8 @@ list2 = []
 MAX = float('-inf')  # for alpha = -infinity
 MIN = float('inf')  # for beta  = infinity
 # define the two players
-AI_Agent = "R"
-Computer = "Y"
+AI_Agent = 1
+Computer = 2
 EMPTY = 0
 
 
@@ -50,14 +50,16 @@ def evaluate_window(window, piece):
     return score
 
 
-def score_state(board, piece):
+def score_position(board, piece):
     score = 0
     ROW_COUNT = 6
     COLUMN_COUNT = 7
     WINDOW_LENGTH = 4
+
     # Score center column
     center_count = sum(row[COLUMN_COUNT // 2] == piece for row in board)
     score += center_count * 3
+
     # Score horizontal
     for row in board:
         for col in range(COLUMN_COUNT - WINDOW_LENGTH + 1):
@@ -81,6 +83,7 @@ def score_state(board, piece):
         for col in range(WINDOW_LENGTH - 1, COLUMN_COUNT):
             window = [board[row + i][col - i] for i in range(WINDOW_LENGTH)]
             score += evaluate_window(window, piece)
+
     return score
 
 
@@ -94,15 +97,7 @@ def print_board(board):
     print("-----------------------------")
 
 
-# define board of 2 dimensions with 6 rows and 7 colums to create connect 4 game
-board = [
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-]
+
 
 
 # define function that calc score of one of players
@@ -168,32 +163,31 @@ def drop_piece(board, row, col, player):
 # function get all possible moves that you can do
 def Move_Options(board):
     avalibale_move = []
+    #print(board)
     for j in range(7):
         if board[0][j] == 0:
             for i in reversed(range(6)):
                 if board[i][j] == 0:
                     avalibale_move.append((i, j))
                     break
+    #print(avalibale_move)
     return avalibale_move
 
 
 # implement minmax algorithm with alpha&beta purning
-def MinMax_Algorithm(board, depth, maxstate, alpha, beta, player):
-    opp_piece = Computer
-    if player == Computer: opp_piece = AI_Agent
+def MinMax_Algorithm(board, depth, maxstate, alpha, beta):
     moves = Move_Options(board)
     is_terminal = is_terminal_game(board)
     if (depth == 0 or is_terminal):
         if (is_terminal):
-            if (winning_move(board, player)):
+            if (winning_move(board, AI_Agent)):
                 return (None, 100000)
             elif (winning_move(board, Computer)):
                 return (None, -100000)
             else:
                 return (None, 0)
         else:
-            score = score_state(board, player)
-            return (None, score)
+            return (None, score_position(board, AI_Agent))
 
             # if maxstate is true that means we are in max mode
     if (maxstate):
@@ -204,9 +198,9 @@ def MinMax_Algorithm(board, depth, maxstate, alpha, beta, player):
             # moves is represent as pair of 2 numbers(i,j), i for rows and j for columns
             # move[0] represent first number in pair (row number)
             # move[1] represent second number in pair (culumn number)
-            drop_piece(new_board, current_move[0], current_move[1], player)
+            drop_piece(new_board, current_move[0], current_move[1], AI_Agent)
             # call the algorithm recursivally with depth-1 and in other mode(that mean if we in max level we call min level and so on..)
-            value = MinMax_Algorithm(new_board, depth - 1, False, alpha, beta, player)[1]
+            value = MinMax_Algorithm(new_board, depth - 1, False, alpha, beta)[1]
             # max_val = max(max_val,value)
             if value > max_val:
                 max_val = value
@@ -221,8 +215,8 @@ def MinMax_Algorithm(board, depth, maxstate, alpha, beta, player):
         cur2 = random.choice(moves)
         for current_move in moves:
             new_board = copy.deepcopy(board)
-            drop_piece(new_board, current_move[0], current_move[1], opp_piece)
-            value = MinMax_Algorithm(new_board, depth - 1, True, alpha, beta, player)[1]
+            drop_piece(new_board, current_move[0], current_move[1], Computer)
+            value = MinMax_Algorithm(new_board, depth - 1, True, alpha, beta)[1]
             #  min_val = min(min_val,value)
             if value < min_val:
                 min_val = value
@@ -246,7 +240,7 @@ def Simple_MinMax_Algorithm(board, depth, maxstate):
             else:
                 return (None, 0)
         else:
-            return (None, score_state(board, AI_Agent))
+            return (None, score_position(board, AI_Agent))
     # if maxstate is true that means we are in max mode
     if (maxstate):
         max_val = MAX
@@ -280,22 +274,30 @@ def Simple_MinMax_Algorithm(board, depth, maxstate):
 # define function that select best move to take
 def make_move(board, depth, player, type):
     moves = Move_Options(board)
-    if (len(moves) == 0):
+    if (is_terminal_game(board)):
         return
-    best_move = None
-    best_score = MAX
+    #best_move = None
+    #best_score = MAX
     if type == "simple":
         best_move, best_score = Simple_MinMax_Algorithm(board, depth, True)
     else:
-        best_move, best_score = MinMax_Algorithm(board, depth, True, MAX, MIN, player)
-    print("AI Agent Select Best Move = ", best_move, " score =", best_score)
+        best_move, best_score = MinMax_Algorithm(board, depth, True, MAX, MIN)
+    print("AI Agent Select Best Move = ", best_move)
     drop_piece(board, best_move[0], best_move[1], player)
     list1.append(best_move)
 
+    print_board(board)
+    print(best_move)
+    print(moves)
+    return best_move[1]
 
-# type = input("Enter Which Algorithm You Want To Use? ")
-# Game_manual(board, 5, type)
-# print_board(board)
-# print(Move_Options(board))
+
+#type = input("Enter Which Algorithm You Want To Use? ")
+#Game(board, 4, type)
+#print_board(board)
+
+######## GAME MENU ########
+
+
 
 

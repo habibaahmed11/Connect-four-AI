@@ -1,6 +1,5 @@
 from PIL import ImageGrab
 import pyautogui
-import main
 
 # YOU MAY NEED TO CHANGE THESE VALUES BASED ON YOUR SCREEN SIZE
 LEFT = 570
@@ -90,8 +89,11 @@ class Board:
         self.board = new_grid
         return (self.board, is_game_end)
 
+    # def select_column(self, column):
+    #     pyautogui.click(
+    #         self._get_grid_cordinates()[column][1] + LEFT,
+    #         self._get_grid_cordinates()[column][0] + TOP,
+    #     )
+
     def select_column(self, column):
-        pyautogui.click(
-            self._get_grid_cordinates()[column][1] + LEFT,
-            self._get_grid_cordinates()[column][0] + TOP,
-        )
+        pyautogui.click(LEFT + self._get_grid_cordinates()[column * 6][0], TOP)

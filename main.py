@@ -1,4 +1,16 @@
 from gamealgorithms import *
+import time
+
+
+#define board of 2 dimensions with 6 rows and 7 colums to create connect 4 game
+board = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+        ]
 
 
 def Game_manual(board, AIdepth, Computerdepth, type):
@@ -81,8 +93,57 @@ def Game_manual2(board, depth, type):
         print("DRAW")
 
 
+def Game_manual_time(board, depth1,depth2, type1, type2):
+    score1 = 0
+    score2 = 0
+    while True:
+        moves = Move_Options(board)
+        if (is_terminal_game(board)):
+            score1 = 0
+            score2 = 0
+            break
+        # first AI Agent play using a minmax algorithm
+        start_time = time.time()
+
+        make_move(board, depth1, AI_Agent, "simple")
+        end_time = time.time()
+        execution_time = (end_time - start_time)*100
+
+        print(f"Execution time of minmax: {execution_time} milli-seconds")
+        # print_board(board)
+        score1 = winning_move(board, AI_Agent)
+        # after every move agent do it in board we check if it win or not
+        if score1:
+            break
+        # second player is computer, it play randomly not using any algorithm
+        # check if the board is full and no one is win so we get out of loop and the result is draw
+
+        start_time = time.time()
+
+        make_move(board, depth1, AI_Agent, "simple")
+        end_time = time.time()
+        execution_time = (end_time - start_time) * 100
+
+        print(f"Execution time of alphabeta: {execution_time} milli-seconds")
+        # print_board(board)
+        score2 = winning_move(board, Computer)
+        # after every move computer do it in board we check if it win or not
+        if score2:
+            break
+    # check which one is win in game or game ended draw
+    if (winning_move(board, AI_Agent)):
+        print("score1= ", Get_score(board, AI_Agent))
+        print("AI AGENT WON")
+    elif (winning_move(board, Computer)):
+        print("score2= ", Get_score(board, Computer))
+        print("COMPUTER WON")
+    else:
+        print("DRAW")
+
+
 type= input("Enter Which Algorithm You Want To Use? ")
-diffficulty = input("CHOOSE DIFFICULTY LEVEL:\na)Easy b)Medium c)Hard d)Human vs AI ")
+diffficulty = input("CHOOSE DIFFICULTY LEVEL:\na)Easy b)Medium c)Hard d)Human vs AI e)Test time")
+
 if(diffficulty=='a'):
     Game_manual(board, 5,2, type)
 elif (diffficulty=='b'):
@@ -91,7 +152,10 @@ elif (diffficulty=='c'):
     Game_manual(board, 5, 4, type)
 elif (diffficulty=='d'):
     Game_manual2(board,5,type)
+elif (diffficulty=='e'):
+    Game_manual_time(board,1,1,"MinMax","AlphaBeta")
 
 print_board(board)
 #print(Move_Options(board))
+
 
